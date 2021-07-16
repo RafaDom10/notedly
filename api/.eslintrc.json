@@ -13,6 +13,10 @@
     "rules": {
       "no-console": "off",
       "no-return-await": "off",
-      "prefer-destructuring": "off"
+      "prefer-destructuring": "off",
+      "no-param-reassign": "off",
+      "no-underscore-dangle": "off",
+      "no-unused-vars": "off",
+      "consistent-return": "off"
     }
 }
