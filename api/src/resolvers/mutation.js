@@ -16,6 +16,7 @@ module.exports = {
     return await models.Note.create({
       content: args.content,
       author: mongoose.Types.ObjectId(user.id),
+      favoriteCount: 0,
     });
   },
 
@@ -27,7 +28,7 @@ module.exports = {
     const note = await models.Note.findById(id);
 
     if (note && String(note.author) !== user.id) {
-      throw new AuthenticationError('You don\'t have permissions to delete the note');
+      throw new ForbiddenError('You don\'t have permissions to delete the note');
     }
 
     try {
@@ -46,26 +47,22 @@ module.exports = {
     const note = await models.Note.findById(id);
 
     if (note && String(note.author) !== user.id) {
-      throw new AuthenticationError('You don\'t have permissions to delete the note');
+      throw new ForbiddenError('You don\'t have permissions to delete the note');
     }
 
-    try {
-      return await models.Note.findOneAndUpdate(
-        {
-          _id: id,
+    return await models.Note.findOneAndUpdate(
+      {
+        _id: id,
+      },
+      {
+        $set: {
+          content,
         },
-        {
-          $set: {
-            content,
-          },
-        },
-        {
-          new: true,
-        },
-      );
-    } catch (err) {
-      throw new Error('Error updating note');
-    }
+      },
+      {
+        new: true,
+      },
+    );
   },
 
   toggleFavorite: async (parent, { id }, { models, user }) => {
@@ -92,7 +89,6 @@ module.exports = {
         },
       );
     }
-
     return await models.Note.findByIdAndUpdate(
       id,
       {
@@ -123,7 +119,6 @@ module.exports = {
 
       return jwt.sign({ id: user._id }, process.env.JWT_SECRET);
     } catch (err) {
-      console.log(err);
       throw new Error('Error creating account');
     }
   },
